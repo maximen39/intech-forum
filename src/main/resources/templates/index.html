@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Main</title>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+</head>
+<body>
+<div class="modal fade" id="threadModal" tabindex="-1" role="dialog" aria-labelledby="threadModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <form class="modal-content" action="/thread/create" method="post">
+            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+            <div class="modal-header">
+                <h5 class="modal-title" id="threadModalModalLabel">Create thread</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="inputGroup-sizing-default">Thread name</span>
+                    </div>
+                    <input type="text" name="name" class="form-control" aria-label="Default"
+                           aria-describedby="inputGroup-sizing-default">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary">Create</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="container h-100" style="padding-top: 45px">
+    <div class="row h-100 justify-content-center align-items-center">
+        <div class="col-12" style="padding-left: 0">
+            <button type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#threadModal">Create
+                thread
+            </button>
+        </div>
+
+        <div class="list-group col-12" style="padding-top: 25px">
+            <#list threads as thread>
+                <a href="/thread/${thread.id}"
+                   class="list-group-item list-group-item-action flex-column align-items-start">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">${thread.name}</h5>
+                        <#if (user.authorities[0])?? && user.authorities[0].authority == "admin">
+                            <form action="/thread/delete/${thread.id}?page=${currentPage}" method="post">
+                                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                                <small>Created at: ${thread.createdAt.time?datetime}</small>
+                                <button type="submit" class="btn badge badge-danger" style="margin-left: 10px">
+                                    Delete
+                                </button>
+                            </form>
+                        <#else>
+                            <small>Created at: ${thread.createdAt.time?datetime}</small>
+                        </#if>
+                    </div>
+                    <small>Thread author: ${thread.author.firstName}</small>
+                </a>
+            </#list>
+        </div>
+
+        <nav style="padding-top: 15px">
+            <ul class="pagination pagination-sm">
+                <#list 1..pages as page>
+                    <#if currentPage == page>
+                        <li class="page-item disabled"><a class="page-link" href="#">${page}</a></li>
+                    <#else>
+                        <li class="page-item"><a class="page-link" href="/?page=${page}">${page}</a></li>
+                    </#if>
+                </#list>
+            </ul>
+        </nav>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</body>
+</html>
